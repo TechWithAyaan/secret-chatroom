@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Dashboard — Chat Room</title>
+  <link rel="stylesheet" href="admin.css"/>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════
+     LOGIN SCREEN
+══════════════════════════════════════════ -->
+<div id="loginScreen" class="login-screen">
+  <div class="login-card">
+    <div class="login-logo">🔧</div>
+    <h1>Admin Panel</h1>
+    <p class="login-sub">Chat Room Dashboard</p>
+    <input type="password" id="passInput" placeholder="Admin Password..." autocomplete="off"/>
+    <button onclick="doLogin()">Login</button>
+    <p id="loginErr" class="login-err"></p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     DASHBOARD
+══════════════════════════════════════════ -->
+<div id="dashboard" class="dashboard hidden">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <span>🔧</span>
+      <span>Admin</span>
+    </div>
+    <nav>
+      <button class="nav-btn active" onclick="switchTab('overview',this)">
+        <span>📊</span> Overview
+      </button>
+      <button class="nav-btn" onclick="switchTab('users',this)">
+        <span>👥</span> Active Users
+      </button>
+      <button class="nav-btn" onclick="switchTab('reserved',this)">
+        <span>🚫</span> Reserved Names
+      </button>
+      <button class="nav-btn" onclick="switchTab('messages',this)">
+        <span>💬</span> Messages
+      </button>
+      <button class="nav-btn" onclick="switchTab('codes',this)">
+        <span>🔑</span> Secret Codes
+      </button>
+    </nav>
+    <button class="logout-btn" onclick="doLogout()">🚪 Logout</button>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+
+    <!-- Header -->
+    <div class="dash-header">
+      <div>
+        <h2 id="tabTitle">Overview</h2>
+        <span class="server-status" id="serverStatus">● Connecting...</span>
+      </div>
+      <div class="header-actions">
+        <span class="uptime-badge" id="uptimeBadge">⏱ --</span>
+        <button class="refresh-btn" onclick="refreshAll()">🔄 Refresh</button>
+      </div>
+    </div>
+
+    <!-- ── TAB: OVERVIEW ── -->
+    <div id="tab-overview" class="tab-content active">
+      <div class="stats-grid">
+        <div class="stat-card green">
+          <div class="stat-icon">👥</div>
+          <div class="stat-val" id="stat-users">0</div>
+          <div class="stat-label">Active Users</div>
+        </div>
+        <div class="stat-card blue">
+          <div class="stat-icon">💬</div>
+          <div class="stat-val" id="stat-msgs">0</div>
+          <div class="stat-label">Total Messages</div>
+        </div>
+        <div class="stat-card red">
+          <div class="stat-icon">🚫</div>
+          <div class="stat-val" id="stat-reserved">0</div>
+          <div class="stat-label">Reserved Names</div>
+        </div>
+        <div class="stat-card purple">
+          <div class="stat-icon">🚀</div>
+          <div class="stat-val" id="stat-uptime">--</div>
+          <div class="stat-label">Server Uptime</div>
+        </div>
+      </div>
+
+      <div class="section-card">
+        <div class="section-head">
+          <h3>⚡ Quick Actions</h3>
+        </div>
+        <div class="quick-actions">
+          <button class="qa-btn danger" onclick="clearAllMessages()">
+            🗑️ Sari Chats Delete Karo
+          </button>
+        </div>
+      </div>
+
+      <!-- Mini users preview -->
+      <div class="section-card">
+        <div class="section-head">
+          <h3>👥 Currently Online</h3>
+        </div>
+        <div id="onlinePreview" class="online-pills"></div>
+      </div>
+    </div>
+
+    <!-- ── TAB: ACTIVE USERS ── -->
+    <div id="tab-users" class="tab-content">
+      <div class="section-card">
+        <div class="section-head">
+          <h3>👥 Active Users</h3>
+          <span id="usersCount" class="badge">0</span>
+        </div>
+        <div class="table-wrap">
+          <table id="usersTable">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Naam</th>
+                <th>Join Time</th>
+                <th>Last Active</th>
+                <th>Messages</th>
+                <th>IP</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="usersBody">
+              <tr><td colspan="7" class="empty-row">Koi user online nahi</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── TAB: RESERVED NAMES ── -->
+    <div id="tab-reserved" class="tab-content">
+      <!-- Add form -->
+      <div class="section-card">
+        <div class="section-head"><h3>➕ Reserved Naam Add Karo</h3></div>
+        <div class="add-form">
+          <input type="text" id="resNameInput" placeholder="Naam (e.g. admin, owner)"/>
+          <input type="text" id="resNoteInput" placeholder="Note (optional)"/>
+          <button class="add-btn" onclick="addReserved()">Add</button>
+        </div>
+      </div>
+
+      <!-- Reserved list -->
+      <div class="section-card">
+        <div class="section-head">
+          <h3>🚫 Reserved Names List</h3>
+          <span id="reservedCount" class="badge">0</span>
+        </div>
+        <div class="table-wrap">
+          <table id="reservedTable">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Naam</th>
+                <th>Note</th>
+                <th>Added</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="reservedBody">
+              <tr><td colspan="5" class="empty-row">Koi reserved naam nahi</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── TAB: MESSAGES ── -->
+    <div id="tab-messages" class="tab-content">
+      <div class="section-card">
+        <div class="section-head">
+          <h3>💬 Recent Messages (Last 100)</h3>
+          <button class="danger-sm" onclick="clearAllMessages()">🗑️ Delete All</button>
+        </div>
+        <div id="msgList" class="msg-list"></div>
+      </div>
+    </div>
+
+    <!-- ── TAB: SECRET CODES ── -->
+    <div id="tab-codes" class="tab-content">
+      <div class="section-card">
+        <div class="section-head"><h3>🔑 Secret Codes Manager</h3></div>
+        <p style="color:var(--muted);font-size:13px;margin-bottom:20px;">
+          Change the secret codes users enter to access the chat rooms. All 3 codes must be different.
+        </p>
+        <div class="codes-form">
+          <div class="code-field">
+            <label>
+              <span class="code-dot green-dot"></span>
+              Real Chat Code
+              <span style="color:var(--muted);font-size:12px;margin-left:6px;">(enters real chat room)</span>
+            </label>
+            <input type="text" id="codeReal" placeholder="e.g. 1234" autocomplete="off"/>
+          </div>
+          <div class="code-field">
+            <label>
+              <span class="code-dot red-dot"></span>
+              Delete All Code
+              <span style="color:var(--muted);font-size:12px;margin-left:6px;">(silently deletes all messages)</span>
+            </label>
+            <input type="text" id="codeDel" placeholder="e.g. 786" autocomplete="off"/>
+          </div>
+          <div class="code-field">
+            <label>
+              <span class="code-dot orange-dot"></span>
+              Ghost Room Code
+              <span style="color:var(--muted);font-size:12px;margin-left:6px;">(enters fake/ghost chat room)</span>
+            </label>
+            <input type="text" id="codeGhost" placeholder="e.g. 7070" autocomplete="off"/>
+          </div>
+          <button class="save-codes-btn" onclick="saveCodes()">💾 Save Codes</button>
+        </div>
+      </div>
+
+      <div class="section-card" style="margin-top:16px;">
+        <div class="section-head"><h3>ℹ️ Current Active Codes</h3></div>
+        <div id="codesDisplay" class="codes-display">
+          <div class="code-item">
+            <span class="code-dot green-dot"></span>
+            <span class="code-lbl">Real Chat:</span>
+            <code id="displayReal">----</code>
+          </div>
+          <div class="code-item">
+            <span class="code-dot red-dot"></span>
+            <span class="code-lbl">Delete All:</span>
+            <code id="displayDel">----</code>
+          </div>
+          <div class="code-item">
+            <span class="code-dot orange-dot"></span>
+            <span class="code-lbl">Ghost Room:</span>
+            <code id="displayGhost">----</code>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- Kick Modal -->
+<div id="kickModal" class="modal-overlay hidden">
+  <div class="modal-box">
+    <h3>👢 Kick User</h3>
+    <p>User: <strong id="kickUsername"></strong></p>
+    <input type="text" id="kickReason" placeholder="Reason (optional)" value="You have been removed by admin!"/>
+    <div class="modal-btns">
+      <button class="cancel-btn" onclick="closeKickModal()">Cancel</button>
+      <button class="danger-btn" onclick="confirmKick()">Kick</button>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Message Modal -->
+<div id="editMsgModal" class="modal-overlay hidden">
+  <div class="modal-box">
+    <h3>✏️ Edit Message</h3>
+    <p style="color:var(--muted);font-size:13px;margin-bottom:14px;">Admin can edit any message</p>
+    <textarea id="editMsgText" rows="4" style="width:100%;background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:11px 14px;color:var(--text);font-size:14px;outline:none;resize:vertical;margin-bottom:16px;font-family:inherit;"></textarea>
+    <div class="modal-btns">
+      <button class="cancel-btn" onclick="closeEditMsgModal()">Cancel</button>
+      <button class="danger-btn" style="background:rgba(124,58,237,.2);border-color:rgba(124,58,237,.4);color:#a855f7;" onclick="confirmEditMsg()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast" class="toast"></div>
+
+<script src="admin.js"></script>
+</body>
+</html>

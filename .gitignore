@@ -1,0 +1,21 @@
+# Dependencies
+node_modules/
+
+# Environment variables (SECRET - never push!)
+.env
+
+# Uploads (user files)
+public/uploads/*
+!public/uploads/.gitkeep
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/

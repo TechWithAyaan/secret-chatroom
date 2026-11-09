@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Secret Chat Room</title>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+
+  <!-- ══════════════════════════════════════════════════
+       SCREEN 1: NAME ENTRY
+  ══════════════════════════════════════════════════ -->
+  <div id="screen-name" class="screen active">
+    <div class="center-card">
+      <div class="logo">💬</div>
+      <h1>Chat Room</h1>
+      <p class="subtitle">Enter your name to continue</p>
+      <div class="input-group">
+        <input type="text" id="nameInput" placeholder="Your name..." maxlength="20" autocomplete="off"/>
+        <button id="nameBtn" onclick="submitName()">Continue <span>→</span></button>
+      </div>
+      <p id="nameError" class="error-msg"></p>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       SCREEN 2: SECRET CODE
+  ══════════════════════════════════════════════════ -->
+  <div id="screen-code" class="screen">
+    <div class="center-card code-card">
+      <div class="logo">🔐</div>
+      <h1>Enter Code</h1>
+      <p class="subtitle">Use the keypad to enter your access code</p>
+
+      <div class="code-display" id="codeDisplay">_ _ _ _</div>
+
+      <div class="numpad">
+        <button class="num-btn" onclick="numPress('1')">1</button>
+        <button class="num-btn" onclick="numPress('2')">2</button>
+        <button class="num-btn" onclick="numPress('3')">3</button>
+        <button class="num-btn" onclick="numPress('4')">4</button>
+        <button class="num-btn" onclick="numPress('5')">5</button>
+        <button class="num-btn" onclick="numPress('6')">6</button>
+        <button class="num-btn" onclick="numPress('7')">7</button>
+        <button class="num-btn" onclick="numPress('8')">8</button>
+        <button class="num-btn" onclick="numPress('9')">9</button>
+        <button class="num-btn del-btn" onclick="numDelete()">&#9003;</button>
+        <button class="num-btn" onclick="numPress('0')">0</button>
+        <button class="num-btn enter-btn" onclick="submitCode()">OK</button>
+      </div>
+
+      <p id="codeError" class="error-msg"></p>
+
+
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       SCREEN 3: CHAT ROOM
+  ══════════════════════════════════════════════════ -->
+  <div id="screen-chat" class="screen">
+
+    <!-- Header -->
+    <div class="chat-header">
+      <div class="header-left">
+        <div class="avatar" id="myAvatar">?</div>
+        <div>
+          <div class="chat-title" id="roomTitle">Chat Room</div>
+          <div class="chat-status" id="onlineStatus">Online</div>
+        </div>
+      </div>
+      <div class="header-right">
+        <span id="onlineCount" class="online-badge">0 online</span>
+        <span id="roomBadge" class="room-badge"></span>
+      </div>
+    </div>
+
+    <!-- Messages -->
+    <div class="messages-area" id="messagesArea">
+      <div class="welcome-msg" id="welcomeMsg">
+        <span>🔒</span> Welcome to the chat room!
+      </div>
+    </div>
+
+    <!-- Emoji Picker -->
+    <div id="emojiPicker" class="emoji-picker hidden">
+      <div class="emoji-tabs">
+        <button class="emoji-tab active" onclick="showEmojiCat('smileys',this)">😊</button>
+        <button class="emoji-tab" onclick="showEmojiCat('hands',this)">👍</button>
+        <button class="emoji-tab" onclick="showEmojiCat('hearts',this)">❤️</button>
+        <button class="emoji-tab" onclick="showEmojiCat('nature',this)">🐶</button>
+        <button class="emoji-tab" onclick="showEmojiCat('food',this)">🍕</button>
+        <button class="emoji-tab" onclick="showEmojiCat('objects',this)">📱</button>
+      </div>
+      <div class="emoji-grid" id="emojiGrid"></div>
+    </div>
+
+    <!-- Input Area -->
+    <div class="input-area">
+
+      <!-- Emoji icon -->
+      <button class="ia-btn emoji-toggle" onclick="toggleEmoji()" title="Emoji">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+      </button>
+
+      <!-- Attach icon -->
+      <button class="ia-btn attach-toggle" onclick="document.getElementById('fileInput').click()" title="Photo / Video">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+      </button>
+      <input type="file" id="fileInput" accept="image/*,video/*" style="display:none" onchange="handleFileSelect(this)"/>
+
+      <!-- Text input -->
+      <input type="text" id="msgInput" placeholder="Type a message..." maxlength="1000"
+             autocomplete="off" onkeydown="if(event.key==='Enter') sendMessage()"/>
+
+      <!-- Voice icon -->
+      <button class="ia-btn voice-toggle" id="voiceBtn" onclick="toggleRecording()" title="Voice Message">
+        <svg id="voiceIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="8" y1="22" x2="16" y2="22"/></svg>
+      </button>
+
+      <!-- Send icon -->
+      <button class="send-btn" onclick="sendMessage()" title="Send">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+      </button>
+
+    </div>
+
+    <!-- Voice recording bar -->
+    <div id="recordingBar" class="recording-bar hidden">
+      <span class="rec-dot"></span>
+      <span id="recTimer">0:00</span>
+      <span class="rec-label">Recording...</span>
+      <button class="rec-cancel" onclick="cancelRecording()">✕ Cancel</button>
+    </div>
+
+  </div>
+
+  <!-- Media Preview Modal -->
+  <div id="mediaModal" class="media-modal hidden" onclick="closeModal()">
+    <div class="modal-content" onclick="event.stopPropagation()">
+      <button class="modal-close" onclick="closeModal()">✕</button>
+      <img id="modalImg" src="" style="display:none"/>
+      <video id="modalVid" src="" controls style="display:none"></video>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="toast"></div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
